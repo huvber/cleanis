@@ -1,6 +1,8 @@
 var Game = function(size){
   this.size = size === undefined ? 10: size;
   this.matrix = [];
+  this.pieceBucket = [];
+  this.score = 0;
 };
 Game.prototype.traverse = function(handler){
   for(var i=0; i<this.size; i++){
@@ -37,10 +39,11 @@ Game.prototype.setPiece = function(xc,yc,piece){
          yi+i >= this.size ||
          xi + k < 0 ||
          xi + k >= this.size ){
-        if(piece.matrix[k][i] !== 0)
+        if(piece.matrix[i][k] !== 0)
           return false;
       } else {
-        if(this.matrix[yi + i][xi + k] !== 0)
+        if(piece.matrix[i][k] !== 0 &&
+          this.matrix[yi + i][xi + k] !== 0)
           ret = false;
       }
     }
@@ -51,11 +54,13 @@ Game.prototype.setPiece = function(xc,yc,piece){
         if(yi + i < 0 ||
            yi+i >= this.size ||
            xi + k < 0 ||
-           xi + k >= this.size )
+           xi + k >= this.size ||
+           piece.matrix[i][k]===0 )
            continue;
-          this.matrix[yi + i][xi + k] = piece.matrix[k][i];
+          this.matrix[yi + i][xi + k] = piece.matrix[i][k];
       }
     }
+    this.score += piece.point;
   }
   return ret;
 };

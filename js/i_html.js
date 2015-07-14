@@ -28,3 +28,6 @@ Interface.prototype.drawMatrix = function(game){
 
     });
   };
+Interface.prototype.drawBucket = function(){
+  var bucket = j('.bucket');
+};

@@ -1,6 +1,5 @@
 // out: ./style.css
 .grid{
-  border:1px solid #ccc;
   width:500px;
   height:500px;
   position:absolute;
@@ -12,6 +11,7 @@
   height:50px;
   position:absolute;
   box-sizing: border-box;
+  border-radius:8px;
   &.block{
     background:#cfc;
   }
