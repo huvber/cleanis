@@ -1,0 +1,28 @@
+// out: ./style.css
+.grid{
+  border:1px solid #ccc;
+  width:500px;
+  height:500px;
+  position:absolute;
+  box-sizing: border-box;
+}
+.block{
+  border:1px solid #fcc;
+  background:#cfc;
+  width:50px;
+  height:50px;
+  position:absolute;
+  box-sizing: border-box;
+}
+.space{
+  border:1px solid #eee;
+  background:#fff;
+  height:50px;
+  width:50px;
+  position:absolute;
+  box-sizing: border-box;
+
+}
+#modelb, #models{
+  display:none;
+}
