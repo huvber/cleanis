@@ -2,8 +2,41 @@ var Interface = function(block_size,game){
   this.bsize = block_size === undefined ? 50 : block_size;
   this.game = game;
   var that = this;
+  this.dragData;
+  interact('.grid').dropzone({
+    // Require a 75% element overlap for a drop to be possible
+    overlap: 0.75,
+    // listen for drop related events:
 
-  j('.grid').bind('ondrop',function(e){
+    ondropactivate: function (e) { },
+    ondragenter: function (e) { },
+    ondragleave: function (e) { },
+    ondrop: function (e) {
+      var origin = that.dragData.coords;
+      var piece = that.dragData.piece;
+      var destination = e.target.dataset;
+      var x = parseInt(destination.x) - (parseInt(origin.x - 1));
+      var y = parseInt(destination.y) - (parseInt(origin.y - 1));
+      console.log(destination);
+      console.log({px: origin.x, py: origin.y});
+      console.log({x: x, y: y});
+      if(game.setPiece(x,y,piece)){
+        game.popBucket();
+        game.pushBucket(pickRandomPiece());
+        that.drawMatrix();
+        that.drawBucket();
+        that.updateScore();
+      } else{
+        that.drawBucket();
+      }
+    },
+    ondropdeactivate: function (event) {
+      // remove active dropzone feedback
+      event.target.classList.remove('drop-active');
+      event.target.classList.remove('drop-target');
+    }
+  });
+  /*j('.grid').bind('ondrop',function(e){
     var origin = e.dataTransfer.getData('coords').split(' - ');
     var piece = JSON.parse(e.dataTransfer.getData('piece'));
     var destination = e.target.dataset;
@@ -23,7 +56,7 @@ var Interface = function(block_size,game){
     }
   }).bind('ondragover',function(ev){
     ev.preventDefault();
-  });
+  });*/
   this.eDrag = undefined;
 };
 Interface.prototype.updateScore = function(){
@@ -89,8 +122,19 @@ Interface.prototype.drawPiece = function(piece){
       }
     }
   }
-  newp.id = '';
-  j(newp).bind('ondragstart',function(e){
+  newp.id = 'p'+Math.floor(Math.random()*1000);
+  interact('#'+newp.id).draggable({
+    onstart: function(e){
+      var localx = Math.floor(e.layerX / _bsize);
+      var localy = Math.floor(e.layerY / _bsize);
+      that.dragData = {};
+      that.dragData.coords = { x: localx, y:localy};
+      that.dragData.piece = piece;
+
+    },
+    onend: that.drawBucket
+  });
+  /*j(newp).bind('ondragstart',function(e){
     var localx = Math.floor(e.layerX / _bsize);
     var localy = Math.floor(e.layerY / _bsize);
     console.log();
@@ -101,6 +145,6 @@ Interface.prototype.drawPiece = function(piece){
   });
   j(newp).bind('ondragend',function(e){
     that.drawBucket();
-  });
+  });*/
   return newp;
 };
