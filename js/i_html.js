@@ -1,20 +1,22 @@
+var dragData = {};
 var Interface = function(block_size,game){
   this.bsize = block_size === undefined ? 50 : block_size;
   this.game = game;
-  var that = this;
   this.dragData;
+  var that = this;
   interact('.grid').dropzone({
     // Require a 75% element overlap for a drop to be possible
     overlap: 0.75,
     // listen for drop related events:
-
-    ondropactivate: function (e) { },
     ondragenter: function (e) { },
     ondragleave: function (e) { },
     ondrop: function (e) {
-      var origin = that.dragData.coords;
-      var piece = that.dragData.piece;
-      var destination = e.target.dataset;
+      var origin = dragData.coords;
+      var piece = dragData.piece;
+      var destination = { x : e.dragEvent.clientX, y: e.dragEvent.clientY };
+      console.log(destination);
+      destination.x = Math.floor(destination.x / that.bsize);
+      destination.y = Math.floor(destination.y / that.bsize);
       var x = parseInt(destination.x) - (parseInt(origin.x - 1));
       var y = parseInt(destination.y) - (parseInt(origin.y - 1));
       console.log(destination);
@@ -30,11 +32,6 @@ var Interface = function(block_size,game){
         that.drawBucket();
       }
     },
-    ondropdeactivate: function (event) {
-      // remove active dropzone feedback
-      event.target.classList.remove('drop-active');
-      event.target.classList.remove('drop-target');
-    }
   });
   /*j('.grid').bind('ondrop',function(e){
     var origin = e.dataTransfer.getData('coords').split(' - ');
@@ -83,6 +80,7 @@ Interface.prototype.drawMatrix = function(){
       element.id = '';
       element.dataset.x = y;
       element.dataset.y = x;
+      element.innerHTML = x + '-' + y;
       element.style.left = left + 'px';
       element.style.top = top + 'px';
       grid.append(element);
@@ -118,6 +116,9 @@ Interface.prototype.drawPiece = function(piece){
         element.style.top = top + 'px';
         element.dataset.x = k;
         element.dataset.y = i;
+        j(element).bind('onmousedown',function(e){
+          dragData.coords = { x:this.dataset.x, y:this.dataset.y};
+        });
         j(newp).append(element);
       }
     }
@@ -125,15 +126,15 @@ Interface.prototype.drawPiece = function(piece){
   newp.id = 'p'+Math.floor(Math.random()*1000);
   interact('#'+newp.id).draggable({
     onstart: function(e){
+      console.log(e);
       var localx = Math.floor(e.layerX / _bsize);
       var localy = Math.floor(e.layerY / _bsize);
-      that.dragData = {};
-      that.dragData.coords = { x: localx, y:localy};
-      that.dragData.piece = piece;
-
+      //dragData.coords = { x: localx, y:localy};
+      dragData.piece = piece;
     },
-    onend: that.drawBucket
+    onmove: dragMoveListener,
   });
+
   /*j(newp).bind('ondragstart',function(e){
     var localx = Math.floor(e.layerX / _bsize);
     var localy = Math.floor(e.layerY / _bsize);
@@ -148,3 +149,18 @@ Interface.prototype.drawPiece = function(piece){
   });*/
   return newp;
 };
+function dragMoveListener (event) {
+    var target = event.target,
+        // keep the dragged position in the data-x/data-y attributes
+        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+    // translate the element
+    target.style.webkitTransform =
+    target.style.transform =
+      'translate(' + x + 'px, ' + y + 'px)';
+
+    // update the posiion attributes
+    target.setAttribute('data-x', x);
+    target.setAttribute('data-y', y);
+  }

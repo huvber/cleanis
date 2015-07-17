@@ -37,7 +37,6 @@ je.prototype.e = function(){ return this.el; };
 je.prototype.get = function(selector){
   if(selector instanceof HTMLElement){ this.el = selector; return this; }
   if(typeof selector === 'function'){ this.el = undefined; return this; }
-  console.log(selector);
   switch(selector.charAt(0)){
     case '.':
       this.el =  [].slice.call(this.el.getElementsByClassName(selector.replace('.','')));
